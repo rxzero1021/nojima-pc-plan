@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>パソコン購入サポート・保証プラン比較</title>
+
+<!-- ===== PWA（ホーム画面追加・オフライン対応）用メタ情報：見た目には影響しません ===== -->
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#273579">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PC比較">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<!-- ============================================================================= -->
+
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+        background-color: #f5f5f7;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+    }
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    /* ===== ノジマ ブランドヘッダー ===== */
+    .brand-header {
+        background: linear-gradient(135deg, #273579 0%, #1c2a63 100%);
+        color: #fff;
+        border-radius: 16px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 6px 16px rgba(39,53,121,0.28);
+    }
+    .brand-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-width: 0;
+    }
+    .brand-logo {
+        height: 46px;
+        width: 46px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.25);
+    }
+    .brand-titles { min-width: 0; }
+    .brand-title {
+        margin: 0;
+        font-size: 1.5em;
+        font-weight: 800;
+        line-height: 1.2;
+        letter-spacing: 0.02em;
+    }
+    .brand-sub {
+        margin: 4px 0 0;
+        font-size: 0.78em;
+        opacity: 0.88;
+    }
+    .brand-mascot {
+        height: 78px;
+        width: auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 2px 6px 0;
+        flex-shrink: 0;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+    }
+    @media (max-width: 480px) {
+        .brand-title { font-size: 1.25em; }
+        .brand-logo { height: 40px; width: 40px; }
+        .brand-mascot { height: 66px; }
+    }
+    /* ===== 全プラン共通の本体価格入力バー ===== */
+    .master-price {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        border-left: 6px solid #273579;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .master-price label {
+        font-size: 1em;
+        font-weight: bold;
+        color: #273579;
+    }
+    .master-price .master-hint {
+        font-size: 0.78em;
+        font-weight: normal;
+        color: #888;
+    }
+    .tax-toggle {
+        display: inline-flex;
+        gap: 14px;
+    }
+    .tax-opt {
+        font-size: 0.9em;
+        font-weight: bold;
+        color: #333;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+    .tax-opt input {
+        width: auto;
+        margin: 0;
+        appearance: auto;
+    }
+    .tax-note {
+        font-size: 0.85em;
+        font-weight: bold;
+        color: #273579;
+        min-height: 1.1em;
+    }
+    /* 値引き前の金額（保証5%計算用）：小さめ表示（読みやすさは維持） */
+    .pre-discount {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 2px;
+    }
+    .pre-discount label {
+        font-size: 0.8em;
+        font-weight: bold;
+        color: #666;
+    }
+    .pre-discount input {
+        padding: 8px 10px;
+        font-size: 13px;
+        max-width: 260px;
+    }
+    .container {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        overflow-x: auto;
+        padding-bottom: 20px;
+    }
+    .plan-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        padding: 20px;
+        flex: 1;
+        min-width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .plan-title {
+        font-size: 2em;
+        font-weight: bold;
+        text-align: center;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #273579;
+        color: #273579;
+        line-height: 1.4;
+    }
+    .plan-subtitle {
+        display: block;
+        font-size: 0.7em;
+        font-weight: normal;
+        color: #555;
+        margin-top: 5px;
+    }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    /* S4施策などの値引き項目は色を変えて分かりやすく */
+    .discount-label {
+        color: #d32f2f;
+    }
+    label {
+        font-size: 0.9em;
+        font-weight: bold;
+        color: #555;
+    }
+    .button-group {
+        display: flex;
+        gap: 5px;
+    }
+    .image-link-btn {
+        font-size: 0.8em;
+        color: #273579;
+        text-decoration: none;
+        background-color: #eef1fb;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: normal;
+        border: 1px solid #c9d2f0;
+        white-space: nowrap;
+    }
+    .image-link-btn:active {
+        background-color: #d7ddf4;
+    }
+    input, select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+        background-color: #fafafa;
+        width: 100%;
+        box-sizing: border-box;
+        appearance: none;
+    }
+
+    .description-box {
+        background-color: #fffde7;
+        border: 1px solid #fff59d;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 0.85em;
+        color: #555;
+        display: none;
+        line-height: 1.5;
+    }
+    .description-item {
+        margin-bottom: 6px;
+    }
+    .description-item:last-child {
+        margin-bottom: 0;
+    }
+    .description-label {
+        color: #f57f17;
+        font-weight: bold;
+        margin-right: 4px;
+    }
+
+    .result-box {
+        background-color: #f0f8ff;
+        border: 1px solid #b0d4ff;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: auto;
+    }
+    .result-missing {
+        color: #e61e25;
+        font-weight: bold;
+        text-align: center;
+        font-size: 0.95em;
+    }
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 0.95em;
+    }
+    .result-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.3em;
+        font-weight: bold;
+        color: #e61e25;
+        border-top: 1px dashed #ccc;
+        padding-top: 10px;
+        margin-top: 5px;
+    }
+    .point-badge {
+        display: inline-block;
+        background-color: #ff9900;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 10px;
+        min-height: 20px;
+    }
+</style>
+</head>
+<body>
+
+<header class="brand-header">
+    <div class="brand-left">
+        <img class="brand-logo" src="nojima-logo.png" alt="ノジマ">
+        <div class="brand-titles">
+            <h1 class="brand-title">パソコン購入プラン比較</h1>
+            <p class="brand-sub">お客様にぴったりのプランをご案内します</p>
+        </div>
+    </div>
+    <img class="brand-mascot" src="mascot.jpeg" alt="ノジマのマスコット">
+</header>
+
+<div class="master-price">
+    <label for="masterPrice">★パソコン本体価格（全プラン共通）<span class="master-hint">入力すると3プランすべてに自動反映されます</span></label>
+    <div class="tax-toggle" role="group" aria-label="税込・税抜の切り替え">
+        <label class="tax-opt"><input type="radio" name="taxMode" value="incl" checked>税込</label>
+        <label class="tax-opt"><input type="radio" name="taxMode" value="excl">税抜</label>
+    </div>
+    <input type="number" id="masterPrice" placeholder="例: 100000" inputmode="numeric">
+    <div class="pre-discount">
+        <label for="preDiscountPrice">値引き前の本体価格（保証5%計算用・20万円以上で加算）</label>
+        <input type="number" id="preDiscountPrice" placeholder="例: 250000" inputmode="numeric">
+    </div>
+    <div class="tax-note" id="taxNote"></div>
+</div>
+
+<div class="container" id="app">
+    <!-- 動的に生成されます -->
+</div>
+
+<script>
+    const planCount = 3;
+
+    const planTitles = [
+        "ライトプラン<span class='plan-subtitle'>～必要な内容をシンプルに～</span>",
+        "スタンダードプラン<span class='plan-subtitle'>～価格と内容のバランスNo.1～</span>",
+        "プレミアムプラン<span class='plan-subtitle'>～すべてを網羅した充実のフルサポート～</span>"
+    ];
+
+    const warranties = [
+        { name: "選択しない", value: 0, type: "none" },
+        { name: "プレミアム安心保証 (11,000円)", value: 11000, type: "premium" },
+        { name: "プレミアム安心保証プラス (22,000円)", value: 22000, type: "plus" },
+        { name: "プレミアム安心保証プラス＋システム保証 (27,500円)", value: 27500, type: "plus" }
+    ];
+
+    const supports = [
+        { name: "選択しない", value: 0 },
+        { name: "ライト1年 (12,980円)", value: 12980 },
+        { name: "ライト2年 (21,780円)", value: 21780 },
+        { name: "ライト3年 (32,780円)", value: 32780 },
+        { name: "ワイド1年 (17,380円)", value: 17380 },
+        { name: "ワイド2年 (26,180円)", value: 26180 },
+        { name: "ワイド3年 (37,180円)", value: 37180 }
+    ];
+
+    const settings = [
+        { name: "選択しない", value: 0 },
+        { name: "安心スタートパック (11,000円)", value: 11000 },
+        { name: "安心スタートパックプラス (22,000円)", value: 22000 },
+        { name: "データ移行パック (37,000円)", value: 37000 },
+        { name: "(会員様)安心スタートパック (8,800円)", value: 8800 },
+        { name: "(会員様)安心スタートパックプラス (17,600円)", value: 17600 },
+        { name: "(会員様)データ移行パック (29,600円)", value: 29600 },
+        { name: "出張設定 (※別資料にてご案内)", value: 0 }
+    ];
+
+    const dataRecoveries = [
+        { name: "選択しない", value: 0 },
+        { name: "データ復旧補償 3年 (22,000円)", value: 22000 },
+        { name: "データ復旧補償 5年 (33,000円)", value: 33000 }
+    ];
+
+    const antiviruses = [
+        { name: "選択しない", value: 0 },
+        { name: "ウイルスバスター 1年 4,600円 (※2000円お得！)", value: 4600 },
+        { name: "ウイルスバスター 3年 8,640円 (※5000円お得！)", value: 8640 },
+        { name: "ウイルスバスター 4年 10,620円 (※5000円お得！)", value: 10620 },
+        { name: "ノートン 1年 4,820円 (※2000円お得！)", value: 4820 },
+        { name: "ノートン 3年 9,300円 (※5000円お得！)", value: 9300 },
+        { name: "マカフィー 1年 3,000円 (※2000円お得！)", value: 3000 },
+        { name: "マカフィー 3年 5,000円 (※5000円お得！)", value: 5000 },
+        { name: "マカフィー 2年分 4,000円 (※富士通パソコン限定)", value: 4000 }
+    ];
+
+    // ★追加：S4施策（値引き）の選択肢
+    const s4Discounts = [
+        { name: "適用しない (0円)", value: 0 },
+        { name: "1,000円値引", value: -1000 },
+        { name: "2,000円値引", value: -2000 },
+        { name: "3,000円値引", value: -3000 },
+        { name: "4,000円値引", value: -4000 },
+        { name: "5,000円値引", value: -5000 },
+        { name: "6,000円値引", value: -6000 },
+        { name: "7,000円値引", value: -7000 },
+        { name: "8,000円値引", value: -8000 },
+        { name: "9,000円値引", value: -9000 },
+        { name: "10,000円値引", value: -10000 }
+    ];
+
+    function formatCurrency(num) {
+        return num.toLocaleString() + "円";
+    }
+
+    function calculate(index) {
+        const pcPrice = parseInt(document.getElementById(`pcPrice_${index}`).value) || 0;
+
+        const warrantySelect = document.getElementById(`warranty_${index}`);
+        let warrantyVal = parseInt(warrantySelect.value) || 0;
+        const warrantyType = warrantySelect.options[warrantySelect.selectedIndex].dataset.type;
+        const warrantyText = warrantySelect.options[warrantySelect.selectedIndex].text;
+
+        // 値引き前の本体価格（税込換算）が20万円以上のとき、保証料に値引き前価格の5%を加算
+        // 値引き前が未入力の場合は金額を表示しない（案内メッセージを表示）
+        let preBase = parseInt(document.getElementById('preDiscountPrice').value) || 0;
+        const taxModeElForW = document.querySelector('input[name="taxMode"]:checked');
+        if (preBase > 0 && taxModeElForW && taxModeElForW.value === 'excl') {
+            preBase = Math.floor(preBase * 1.1); // 税抜入力なら税込に換算（1円未満切り捨て）
+        }
+        let warrantySurcharge = 0;
+        if (warrantyVal > 0 && preBase >= 200000) {
+            warrantySurcharge = Math.floor(preBase * 0.05); // 1円未満切り捨て
+            warrantyVal += warrantySurcharge;
+        }
+
+        const supportSelect = document.getElementById(`support_${index}`);
+        const supportVal = parseInt(supportSelect.value) || 0;
+        const supportText = supportSelect.options[supportSelect.selectedIndex].text;
+
+        const settingSelect = document.getElementById(`setting_${index}`);
+        const settingVal = parseInt(settingSelect.value) || 0;
+        const settingText = settingSelect.options[settingSelect.selectedIndex].text;
+
+        const dataRecSelect = document.getElementById(`dataRecovery_${index}`);
+        const dataRecVal = parseInt(dataRecSelect.value) || 0;
+
+        const avSelect = document.getElementById(`antivirus_${index}`);
+        const avVal = parseInt(avSelect.value) || 0;
+
+        // ★追加：S4施策の表示/非表示判定と値取得
+        const s4Group = document.getElementById(`s4Group_${index}`);
+        const s4Select = document.getElementById(`s4Discount_${index}`);
+        let s4Val = 0;
+
+        // 条件：PCサポートが0円より大きい ＆ セッティング名に「(会員様)」が含まれている
+        if (supportVal > 0 && settingText.includes("(会員様)")) {
+            s4Group.style.display = "flex"; // 条件を満たしたら表示
+            s4Val = parseInt(s4Select.value) || 0;
+        } else {
+            s4Group.style.display = "none"; // 条件を満たさない場合は隠す
+            s4Select.value = 0;             // 値を0にリセット
+            s4Val = 0;
+        }
+
+        // 金額の計算（全オプションを合算 ※値引きはマイナスなのでそのまま足す）
+        const optionTotal = warrantyVal + supportVal + settingVal + dataRecVal + avVal + s4Val;
+        const grandTotal = pcPrice + optionTotal;
+
+        // ポイント計算
+        let points = 0;
+        if (supportVal > 0) {
+            if (warrantyType === "premium") {
+                points = 2000;
+            } else if (warrantyType === "plus") {
+                points = 3000;
+            }
+        }
+
+        // 画面更新（値引き前が未入力なら金額を出さず案内を表示）
+        const hasPre = preBase > 0;
+        document.getElementById(`resultMissing_${index}`).style.display = hasPre ? "none" : "block";
+        document.getElementById(`resultRows_${index}`).style.display = hasPre ? "block" : "none";
+
+        document.getElementById(`optionTotal_${index}`).innerText = formatCurrency(optionTotal);
+        document.getElementById(`grandTotal_${index}`).innerText = formatCurrency(grandTotal);
+
+        const pointEl = document.getElementById(`points_${index}`);
+        if (points > 0 && hasPre) {
+            pointEl.innerText = `プレゼント ${points.toLocaleString()} ポイント付与対象！`;
+            pointEl.style.display = "block";
+        } else {
+            pointEl.style.display = "none";
+        }
+
+        // 説明文の生成ロジック
+        let descHtml = "";
+
+        if (warrantyText.includes("システム保証")) {
+            descHtml += `<div class="description-item"><span class="description-label">【保証】</span>自然・物損・水濡れ保証 ＋ システムプログラム関係</div>`;
+        } else if (warrantyText.includes("プラス")) {
+            descHtml += `<div class="description-item"><span class="description-label">【保証】</span>自然・物損・水濡れ保証</div>`;
+        } else if (warrantyText.includes("プレミアム安心保証")) {
+            descHtml += `<div class="description-item"><span class="description-label">【保証】</span>自然故障</div>`;
+        }
+
+        if (warrantySurcharge > 0) {
+            descHtml += `<div class="description-item"><span class="description-label">【保証加算】</span>値引き前の本体価格が20万円以上のため値引き前価格の5%（+${warrantySurcharge.toLocaleString()}円）を加算 → 保証料 ${warrantyVal.toLocaleString()}円</div>`;
+        }
+
+        if (supportText.includes("ワイド")) {
+            descHtml += `<div class="description-item"><span class="description-label">【ｻﾎﾟｰﾄ】</span>電話相談（9：30～21：00）・遠隔操作・店頭調子見無料・設定料金２割引</div>`;
+        } else if (supportText.includes("ライト")) {
+            descHtml += `<div class="description-item"><span class="description-label">【ｻﾎﾟｰﾄ】</span>電話相談（9：30～19：00）・遠隔操作・店頭調子見無料・設定料金２割引</div>`;
+        }
+
+        if (settingText.includes("データ移行パック")) {
+            descHtml += `<div class="description-item"><span class="description-label">【設定】</span>初期設定・office設定・ウイルス対策設定・データ移行（100GB迄）</div>`;
+        } else if (settingText.includes("スタートパックプラス")) {
+            descHtml += `<div class="description-item"><span class="description-label">【設定】</span>初期設定・office設定・ウイルス対策設定（ソフト代別料金）・メール設定・Windows＆メーカーアップデート</div>`;
+        } else if (settingText.includes("スタートパック")) {
+            descHtml += `<div class="description-item"><span class="description-label">【設定】</span>初期設定・office設定・ウイルス対策設定（ソフト代別料金）</div>`;
+        }
+
+        // 説明枠の表示制御
+        const descBox = document.getElementById(`descBox_${index}`);
+        if (descHtml !== "") {
+            descBox.innerHTML = descHtml;
+            descBox.style.display = "block";
+        } else {
+            descBox.style.display = "none";
+        }
+    }
+
+    const app = document.getElementById('app');
+
+    for (let i = 1; i <= planCount; i++) {
+        const card = document.createElement('div');
+        card.className = 'plan-card';
+
+        let html = `<div class="plan-title">${planTitles[i - 1]}</div>`;
+
+        html += `
+            <div class="form-group">
+                <label>★パソコン本体価格 (手入力)</label>
+                <input type="number" id="pcPrice_${i}" placeholder="例: 100000" oninput="calculate(${i})">
+            </div>
+        `;
+
+        html += `<div class="form-group"><label>★延長保証</label><select id="warranty_${i}" onchange="calculate(${i})">`;
+        warranties.forEach(w => { html += `<option value="${w.value}" data-type="${w.type}">${w.name}</option>`; });
+        html += `</select></div>`;
+
+        html += `
+            <div class="form-group">
+                <label style="display: flex; justify-content: space-between; align-items: center;">
+                    ★PCサポート
+                    <div class="button-group">
+                        <a href="sapo1.jpeg" target="_blank" class="image-link-btn">クリップ PCサポートライト</a>
+                        <a href="sapo2.jpeg" target="_blank" class="image-link-btn">クリップ PCサポートワイド</a>
+                    </div>
+                </label>
+                <select id="support_${i}" onchange="calculate(${i})">
+        `;
+        supports.forEach(s => { html += `<option value="${s.value}">${s.name}</option>`; });
+        html += `</select></div>`;
+
+        html += `<div class="form-group"><label>★セッティング</label><select id="setting_${i}" onchange="calculate(${i})">`;
+        settings.forEach(s => { html += `<option value="${s.value}">${s.name}</option>`; });
+        html += `</select></div>`;
+
+        // ★追加：S4施策（初期状態は非表示: display:none）
+        html += `<div class="form-group" id="s4Group_${i}" style="display:none;">
+                    <label class="discount-label">★S4施策 (条件達成で値引可能)</label>
+                    <select id="s4Discount_${i}" onchange="calculate(${i})">`;
+        s4Discounts.forEach(d => { html += `<option value="${d.value}">${d.name}</option>`; });
+        html += `</select></div>`;
+
+        html += `<div class="form-group"><label>★データ復旧補償</label><select id="dataRecovery_${i}" onchange="calculate(${i})">`;
+        dataRecoveries.forEach(d => { html += `<option value="${d.value}">${d.name}</option>`; });
+        html += `</select></div>`;
+
+        html += `
+            <div class="form-group">
+                <label style="display: flex; justify-content: space-between; align-items: center;">
+                    ★ウイルス対策ソフト
+                    <a href="uirusu.jpeg" target="_blank" class="image-link-btn">クリップ ウイルス対策ソフト</a>
+                </label>
+                <select id="antivirus_${i}" onchange="calculate(${i})">
+        `;
+        antiviruses.forEach(a => { html += `<option value="${a.value}">${a.name}</option>`; });
+        html += `</select></div>`;
+
+        html += `<div class="description-box" id="descBox_${i}"></div>`;
+
+        html += `
+            <div class="result-box">
+                <div class="result-missing" id="resultMissing_${i}">値引き前の金額が入力されていません</div>
+                <div class="result-rows" id="resultRows_${i}" style="display:none;">
+                    <div class="result-item">
+                        <span>オプション合計:</span>
+                        <span id="optionTotal_${i}">0円</span>
+                    </div>
+                    <div class="result-total">
+                        <span>総合計:</span>
+                        <span id="grandTotal_${i}">0円</span>
+                    </div>
+                </div>
+                <div class="point-badge" id="points_${i}" style="display:none;"></div>
+            </div>
+        `;
+
+        card.innerHTML = html;
+        app.appendChild(card);
+    }
+
+    // ===== 全プラン共通の本体価格：税込/税抜を切り替え、税抜なら消費税10%を自動計算して反映 =====
+    const TAX_RATE = 0.10;
+    function applyMasterPrice() {
+        const raw = parseInt(document.getElementById('masterPrice').value) || 0;
+        const modeEl = document.querySelector('input[name="taxMode"]:checked');
+        const mode = modeEl ? modeEl.value : 'incl';
+        const note = document.getElementById('taxNote');
+
+        // 各プランへ反映する金額は「税込」に統一
+        let inclusive = raw;
+        if (mode === 'excl') {
+            inclusive = Math.floor(raw * (1 + TAX_RATE)); // 1円未満切り捨て
+            note.textContent = raw > 0
+                ? `税抜 ${raw.toLocaleString()}円 → 税込 ${inclusive.toLocaleString()}円`
+                : '';
+        } else {
+            note.textContent = '';
+        }
+
+        for (let i = 1; i <= planCount; i++) {
+            document.getElementById(`pcPrice_${i}`).value = inclusive > 0 ? inclusive : '';
+            calculate(i);
+        }
+    }
+    document.getElementById('masterPrice').addEventListener('input', applyMasterPrice);
+    document.querySelectorAll('input[name="taxMode"]').forEach((r) => r.addEventListener('change', applyMasterPrice));
+
+    // 値引き前の金額が変わったら全プランの保証加算を再計算
+    document.getElementById('preDiscountPrice').addEventListener('input', () => {
+        for (let i = 1; i <= planCount; i++) calculate(i);
+    });
+
+    // ===== PWA：オフライン利用のためのサービスワーカー登録（画面表示には影響しません） =====
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+    }
+</script>
+
+</body>
+</html>
