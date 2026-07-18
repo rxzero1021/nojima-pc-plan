@@ -1245,6 +1245,228 @@ input::placeholder {
 }
 
 </style>
+
+<style>
+
+/* ===== Final interaction polish ===== */
+.brand-header {
+    border: 1px solid rgba(255,255,255,0.14);
+    box-shadow:
+        0 14px 34px rgba(19, 35, 91, 0.24),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.product-select {
+    border-color: rgba(255,255,255,0.88);
+    background-color: #fff;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23172969' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    color: var(--brand-blue);
+    box-shadow:
+        0 5px 14px rgba(8, 18, 52, 0.2),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.product-select:active {
+    transform: translateY(1px);
+    box-shadow:
+        0 2px 8px rgba(8, 18, 52, 0.18),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.master-price {
+    border: 1px solid rgba(164, 175, 194, 0.52);
+    background:
+        linear-gradient(135deg, rgba(255,255,255,0.98), rgba(247,250,255,0.98)),
+        #fff;
+    box-shadow:
+        0 12px 32px rgba(33, 48, 77, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.95);
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.master-price:focus-within {
+    border-color: rgba(39, 53, 121, 0.45);
+    box-shadow:
+        0 16px 38px rgba(33, 48, 77, 0.16),
+        0 0 0 4px rgba(39, 53, 121, 0.08),
+        inset 0 1px 0 rgba(255,255,255,0.95);
+}
+.plan-card {
+    animation: plan-reveal 420ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+.plan-card:nth-child(2) {
+    animation-delay: 45ms;
+}
+.plan-card:nth-child(3) {
+    animation-delay: 90ms;
+}
+.plan-card > .form-group {
+    transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+.plan-card > .form-group:focus-within {
+    background: color-mix(in srgb, var(--plan-tint) 70%, #fff);
+    box-shadow: inset 4px 0 0 var(--plan-accent);
+}
+input,
+select,
+.image-link-btn {
+    transition:
+        border-color 150ms ease,
+        background-color 150ms ease,
+        box-shadow 150ms ease,
+        transform 120ms ease;
+}
+.image-link-btn:active {
+    transform: translateY(1px) scale(0.99);
+}
+.result-box.is-updated {
+    animation: total-update 480ms ease-out;
+}
+.plan-pagination {
+    display: none;
+}
+.plan-dot {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
+}
+.page-top-button {
+    position: fixed;
+    z-index: 60;
+    right: max(14px, env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    background: var(--brand-blue);
+    color: #fff;
+    font-family: inherit;
+    font-size: 25px;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow:
+        0 10px 26px rgba(16, 31, 80, 0.28),
+        inset 0 1px 0 rgba(255,255,255,0.18);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px) scale(0.92);
+    transition: opacity 180ms ease, transform 180ms ease, box-shadow 150ms ease;
+}
+.page-top-button.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+.page-top-button:active {
+    transform: translateY(1px) scale(0.96);
+    box-shadow:
+        0 5px 16px rgba(16, 31, 80, 0.25),
+        inset 0 1px 0 rgba(255,255,255,0.18);
+}
+@keyframes plan-reveal {
+    from {
+        opacity: 0.72;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes total-update {
+    0% {
+        filter: brightness(1);
+        transform: scale(1);
+    }
+    42% {
+        filter: brightness(1.12);
+        transform: scale(1.008);
+    }
+    100% {
+        filter: brightness(1);
+        transform: scale(1);
+    }
+}
+@media (max-width: 899px) {
+    body {
+        padding-bottom: max(72px, calc(env(safe-area-inset-bottom) + 62px));
+    }
+    .plan-pagination {
+        position: fixed;
+        z-index: 55;
+        left: 50%;
+        bottom: max(12px, env(safe-area-inset-bottom));
+        display: flex;
+        align-items: center;
+        gap: 1px;
+        padding: 4px 7px;
+        border: 1px solid rgba(255,255,255,0.55);
+        border-radius: 24px;
+        background: rgba(25, 31, 47, 0.82);
+        box-shadow:
+            0 10px 26px rgba(20, 28, 45, 0.25),
+            inset 0 1px 0 rgba(255,255,255,0.12);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transform: translateX(-50%);
+    }
+    .plan-dot {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        touch-action: manipulation;
+    }
+    .plan-dot::before {
+        content: "";
+        display: block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.3);
+        transition: width 180ms ease, border-radius 180ms ease, box-shadow 180ms ease;
+    }
+    .plan-dot:nth-child(1)::before {
+        background: #45a76c;
+    }
+    .plan-dot:nth-child(2)::before {
+        background: #4d91d3;
+    }
+    .plan-dot:nth-child(3)::before {
+        background: #dab348;
+    }
+    .plan-dot.is-active::before {
+        width: 22px;
+        border-radius: 8px;
+        box-shadow:
+            0 0 0 2px rgba(255,255,255,0.88),
+            0 2px 7px rgba(0,0,0,0.22);
+    }
+    .page-top-button {
+        right: max(10px, env(safe-area-inset-right));
+        bottom: max(13px, env(safe-area-inset-bottom));
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .plan-card,
+    .result-box.is-updated {
+        animation: none;
+    }
+    .product-select,
+    input,
+    select,
+    .image-link-btn,
+    .plan-dot::before,
+    .page-top-button {
+        transition: none;
+    }
+}
+
+</style>
 </head>
 <body>
 
@@ -1278,6 +1500,13 @@ input::placeholder {
 <div class="container" id="app">
     <!-- 動的に生成されます -->
 </div>
+
+<nav class="plan-pagination" aria-label="プラン表示位置">
+    <button type="button" class="plan-dot is-active" data-plan-index="0" aria-label="ライトプランを表示" aria-current="true"></button>
+    <button type="button" class="plan-dot" data-plan-index="1" aria-label="スタンダードプランを表示"></button>
+    <button type="button" class="plan-dot" data-plan-index="2" aria-label="プレミアムプランを表示"></button>
+</nav>
+<button type="button" class="page-top-button" id="pageTopButton" aria-label="ページ上部へ戻る" title="ページ上部へ戻る">↑</button>
 
 <script>
     const planCount = 3;
@@ -1796,6 +2025,103 @@ input::placeholder {
                 .catch(() => {});
         });
     }
+</script>
+
+<script>
+    // ===== 表示専用：プラン位置・上部移動・計算結果の反応 =====
+    (() => {
+        const planContainer = document.getElementById('app');
+        const planDots = Array.from(document.querySelectorAll('.plan-dot'));
+        const pageTopButton = document.getElementById('pageTopButton');
+        const watchedTotals = new WeakSet();
+        let scrollFrame = 0;
+
+        function updatePlanPosition() {
+            const cards = Array.from(planContainer.querySelectorAll('.plan-card'));
+            if (!cards.length) return;
+
+            const containerRect = planContainer.getBoundingClientRect();
+            const center = containerRect.left + planContainer.clientWidth / 2;
+            let activeIndex = 0;
+            let nearestDistance = Infinity;
+
+            cards.forEach((card, index) => {
+                const rect = card.getBoundingClientRect();
+                const distance = Math.abs(rect.left + rect.width / 2 - center);
+                if (distance < nearestDistance) {
+                    nearestDistance = distance;
+                    activeIndex = index;
+                }
+            });
+
+            planDots.forEach((dot, index) => {
+                const active = index === activeIndex;
+                dot.classList.toggle('is-active', active);
+                if (active) {
+                    dot.setAttribute('aria-current', 'true');
+                } else {
+                    dot.removeAttribute('aria-current');
+                }
+            });
+        }
+
+        function requestPlanPositionUpdate() {
+            if (scrollFrame) cancelAnimationFrame(scrollFrame);
+            scrollFrame = requestAnimationFrame(() => {
+                scrollFrame = 0;
+                updatePlanPosition();
+            });
+        }
+
+        function watchTotals() {
+            document.querySelectorAll('[id^="grandTotal_"]').forEach((total) => {
+                if (watchedTotals.has(total)) return;
+                watchedTotals.add(total);
+
+                const observer = new MutationObserver(() => {
+                    const resultBox = total.closest('.result-box');
+                    if (!resultBox) return;
+                    resultBox.classList.remove('is-updated');
+                    void resultBox.offsetWidth;
+                    resultBox.classList.add('is-updated');
+                    window.setTimeout(() => resultBox.classList.remove('is-updated'), 520);
+                });
+                observer.observe(total, { childList: true, characterData: true, subtree: true });
+            });
+        }
+
+        planDots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const cards = Array.from(planContainer.querySelectorAll('.plan-card'));
+                const card = cards[Number(dot.dataset.planIndex)];
+                if (!card) return;
+
+                const containerRect = planContainer.getBoundingClientRect();
+                const cardRect = card.getBoundingClientRect();
+                const targetLeft = cardRect.left - containerRect.left + planContainer.scrollLeft;
+                planContainer.scrollTo({ left: targetLeft, behavior: 'smooth' });
+            });
+        });
+
+        planContainer.addEventListener('scroll', requestPlanPositionUpdate, { passive: true });
+        window.addEventListener('resize', requestPlanPositionUpdate, { passive: true });
+        window.addEventListener('scroll', () => {
+            pageTopButton.classList.toggle('is-visible', window.scrollY > 360);
+        }, { passive: true });
+
+        pageTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        const cardObserver = new MutationObserver(() => {
+            watchTotals();
+            requestPlanPositionUpdate();
+        });
+        cardObserver.observe(planContainer, { childList: true });
+
+        watchTotals();
+        updatePlanPosition();
+    })();
 </script>
 
 </body>
