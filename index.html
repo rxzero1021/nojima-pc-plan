@@ -535,9 +535,10 @@
         } else if (warrantyText.includes("プレミアム安心保証")) {
             descHtml += `<div class="description-item"><span class="description-label">【保証】</span>自然故障</div>`;
         }
-        if (warrantySurcharge > 0) {
-            descHtml += `<div class="description-item"><span class="description-label">【保証加算】</span>値引き前の本体価格が20万円以上のため値引き前価格の5%（+${warrantySurcharge.toLocaleString()}円）を加算 → 保証料 ${warrantyVal.toLocaleString()}円</div>`;
-        }
+        const surchargeNote = document.getElementById(`surchargeNote_${index}`);
+        surchargeNote.innerHTML = warrantySurcharge > 0
+            ? `<div class="description-item"><span class="description-label">【保証加算】</span>値引き前の本体価格が20万円以上のため値引き前価格の5%（+${warrantySurcharge.toLocaleString()}円）を加算 → 保証料 ${warrantyVal.toLocaleString()}円</div>`
+            : "";
         if (supportText.includes("ワイド")) {
             descHtml += `<div class="description-item"><span class="description-label">【ｻﾎﾟｰﾄ】</span>電話相談（9：30～21：00）・遠隔操作・店頭調子見無料・設定料金２割引</div>`;
         } else if (supportText.includes("ライト")) {
@@ -631,7 +632,7 @@
 
             html += `<div class="form-group"><label>★延長保証</label><select id="warranty_${i}" onchange="calculate(${i})">`;
             warranties.forEach(w => { html += `<option value="${w.value}" data-type="${w.type}">${w.name}</option>`; });
-            html += `</select></div>`;
+            html += `</select><div class="surcharge-note" id="surchargeNote_${i}"></div></div>`;
 
             html += `
                 <div class="form-group">
