@@ -417,6 +417,7 @@
         { key: "standard", title: "スタンダードプラン", sub: "～価格と内容のバランスNo.1～",           warrantyLabel: "プレミアム安心保証",       points: 2000 },
         { key: "premium",  title: "プレミアムプラン",   sub: "～すべてを網羅した充実のフルサポート～", warrantyLabel: "プレミアム安心保証プラス", points: 3000 }
     ];
+    const APPLIANCE_SUPPORT_PRICE = 14300;
 
     // 商品ごとの設定（保証5%加算の閾値：PC=22万、家電=11万）
     const PRODUCT_META = {
@@ -727,8 +728,7 @@
                     <div class="surcharge-note" id="surchargeNote_${i}"></div>
                 </div>`;
 
-            const supportValue = currentProduct === "aircon" ? 14300 : "";
-            const supportPlaceholder = currentProduct === "aircon" ? "" : "金額を入力（商品・単価で変動）";
+            const supportValue = APPLIANCE_SUPPORT_PRICE;
 
             html += `
                 <div class="form-group">
@@ -736,7 +736,7 @@
                         ★サポート
                         <a href="${p.leaflet}" target="_blank" class="image-link-btn">クリップ サポートリーフレット</a>
                     </label>
-                    <input type="number" id="support_${i}" value="${supportValue}" placeholder="${supportPlaceholder}" inputmode="numeric" oninput="calculate(${i})">
+                    <input type="number" id="support_${i}" value="${supportValue}" inputmode="numeric" oninput="calculate(${i})">
                 </div>`;
 
             html += `
