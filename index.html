@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>ノジマ 購入プラン比較</title>
 
 <!-- ===== PWA（ホーム画面追加・オフライン対応）用メタ情報：見た目には影響しません ===== -->
@@ -455,10 +455,6 @@
             width: 100%;
         }
     }
-</style>
-
-<style>
-
 /* ===== Touch-first professional UI: iPad / smartphone ===== */
 :root {
     --app-bg: #e8edf4;
@@ -1244,10 +1240,6 @@ input::placeholder {
     }
 }
 
-</style>
-
-<style>
-
 /* ===== Final interaction polish ===== */
 .brand-header {
     border: 1px solid rgba(255,255,255,0.14);
@@ -1466,6 +1458,271 @@ select,
     }
 }
 
+/* ===== Precision UX refinement: v31 ===== */
+:root {
+    color-scheme: light;
+}
+html {
+    scroll-behavior: smooth;
+}
+body {
+    isolation: isolate;
+    font-kerning: normal;
+}
+.brand-logo,
+.brand-mascot {
+    object-fit: contain;
+}
+.brand-header,
+.master-price,
+.plan-card {
+    backface-visibility: hidden;
+}
+.brand-header {
+    box-shadow:
+        0 16px 38px rgba(19, 35, 91, 0.25),
+        0 2px 5px rgba(19, 35, 91, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.product-select:focus-visible,
+.page-top-button:focus-visible,
+.plan-dot:focus-visible,
+.image-link-btn:focus-visible {
+    outline: 3px solid rgba(255,255,255,0.94);
+    outline-offset: 3px;
+}
+.master-price::before {
+    height: 5px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.75);
+}
+.master-price input,
+.pre-discount input {
+    caret-color: var(--brand-red);
+}
+.master-price input.has-value,
+.pre-discount input.has-value {
+    border-color: rgba(39, 53, 121, 0.65);
+    background: #fff;
+    box-shadow:
+        0 0 0 1px rgba(39, 53, 121, 0.07),
+        inset 0 1px 2px rgba(23, 41, 105, 0.05);
+}
+input[type="number"] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+input:focus-visible,
+select:focus-visible {
+    outline: none;
+    border-color: var(--plan-accent, var(--brand-blue-light));
+    box-shadow:
+        0 0 0 4px color-mix(in srgb, var(--plan-accent, var(--brand-blue-light)) 18%, transparent),
+        inset 0 1px 2px rgba(31,42,60,0.04);
+}
+.plan-card {
+    contain: layout paint;
+}
+.plan-title {
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+}
+.plan-card:nth-child(2) .plan-title {
+    background:
+        linear-gradient(105deg, transparent 0 28%, rgba(255,255,255,0.18) 42%, transparent 56%),
+        linear-gradient(120deg, #103b73 0%, #1d5b9e 34%, #4388ca 51%, #1a5594 72%, #103b73 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.32),
+        inset 0 -3px 0 rgba(7, 42, 83, 0.3);
+}
+.plan-card:nth-child(3) .plan-title {
+    background:
+        linear-gradient(105deg, transparent 0 26%, rgba(255,255,255,0.33) 41%, transparent 57%),
+        linear-gradient(120deg, #85600e 0%, #c29324 25%, #f1d77f 49%, #c28e1c 72%, #7e590a 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.7),
+        inset 0 -3px 0 rgba(94, 62, 3, 0.32);
+}
+.plan-card > .form-group.has-value {
+    background: color-mix(in srgb, var(--plan-tint) 72%, #fff);
+    box-shadow: inset 4px 0 0 var(--plan-accent);
+}
+.plan-card > .form-group.has-value > label {
+    color: var(--plan-accent-deep);
+}
+.plan-card > .form-group.has-value input,
+.plan-card > .form-group.has-value select {
+    border-color: color-mix(in srgb, var(--plan-accent) 58%, #c6ccd5);
+    background-color: #fff;
+}
+.image-link-btn {
+    min-height: 44px;
+    padding: 7px 10px;
+    font-size: 12.5px;
+}
+.description-box {
+    box-shadow: inset 4px 0 0 #e4bd31;
+}
+.result-box::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: rgba(255,255,255,0.5);
+    pointer-events: none;
+}
+.result-total span:last-child {
+    text-rendering: geometricPrecision;
+    font-variant-numeric: tabular-nums lining-nums;
+}
+.result-box.is-updated .result-total span:last-child {
+    animation: total-number-update 480ms cubic-bezier(0.2, 0.72, 0.25, 1);
+}
+.page-top-button {
+    width: 42px;
+    height: 42px;
+    border: 2px solid rgba(255,255,255,0.9);
+    background: #172969;
+    color: #fff;
+    font-size: 21px;
+    box-shadow:
+        0 10px 24px rgba(16, 31, 80, 0.34),
+        inset 0 1px 0 rgba(255,255,255,0.22);
+}
+@keyframes total-number-update {
+    0% {
+        opacity: 0.8;
+        transform: translateY(3px);
+    }
+    45% {
+        opacity: 1;
+        transform: translateY(-1px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+@media (min-width: 600px) {
+    .master-price > .pre-discount {
+        padding-left: 20px;
+        border-left: 1px solid #dbe1eb;
+    }
+}
+@media (max-width: 899px) {
+    body {
+        padding-bottom: max(18px, env(safe-area-inset-bottom));
+    }
+    .container {
+        padding-right: 14px;
+        scroll-padding-right: 14px;
+    }
+    .plan-card {
+        transition:
+            border-color 180ms ease,
+            box-shadow 180ms ease,
+            opacity 180ms ease,
+            transform 180ms ease;
+    }
+    .plan-card.is-current {
+        box-shadow:
+            0 16px 36px rgba(28, 39, 62, 0.17),
+            0 0 0 2px color-mix(in srgb, var(--plan-accent) 42%, transparent);
+    }
+    .plan-card.is-current:nth-child(2) {
+        box-shadow:
+            0 19px 40px rgba(24, 84, 149, 0.23),
+            0 0 0 2px rgba(77, 145, 211, 0.42),
+            inset 0 0 0 1px rgba(169, 205, 239, 0.44);
+    }
+    .plan-card.is-current:nth-child(3) {
+        box-shadow:
+            0 22px 44px rgba(112, 78, 7, 0.28),
+            0 0 0 2px rgba(218, 179, 72, 0.52),
+            inset 0 0 0 3px rgba(255, 236, 180, 0.34);
+    }
+    .plan-pagination {
+        position: relative;
+        z-index: 2;
+        left: auto;
+        right: auto;
+        top: auto;
+        bottom: auto;
+        width: max-content;
+        margin: 0 auto 8px;
+        flex-direction: row;
+        gap: 1px;
+        padding: 4px 7px;
+        border: 1px solid rgba(255,255,255,0.62);
+        border-radius: 24px;
+        background: rgba(25, 31, 47, 0.86);
+        box-shadow:
+            0 8px 20px rgba(20, 28, 45, 0.2),
+            inset 0 1px 0 rgba(255,255,255,0.14);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        transform: none;
+    }
+    .plan-dot {
+        width: 36px;
+        height: 36px;
+    }
+    .plan-dot::before {
+        width: 10px;
+        height: 10px;
+        box-shadow:
+            0 0 0 2px rgba(255,255,255,0.95),
+            0 2px 7px rgba(0,0,0,0.24);
+        transition: width 180ms ease, border-radius 180ms ease, box-shadow 180ms ease;
+    }
+    .plan-dot.is-active::before {
+        width: 23px;
+        height: 10px;
+        border-radius: 8px;
+    }
+    .page-top-button {
+        right: max(0px, env(safe-area-inset-right));
+        bottom: max(12px, env(safe-area-inset-bottom));
+        width: 40px;
+        height: 40px;
+    }
+}
+@media (max-width: 599px) {
+    .container {
+        padding-right: 10px;
+        scroll-padding-right: 10px;
+    }
+    .plan-card {
+        flex-basis: 88vw;
+        min-width: 88vw;
+    }
+    .result-total span:last-child {
+        font-size: 36px;
+    }
+}
+@media (max-width: 350px) {
+    .plan-card {
+        flex-basis: calc(100vw - 38px);
+        min-width: calc(100vw - 38px);
+    }
+    .image-link-btn {
+        font-size: 12px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+    .result-box.is-updated .result-total span:last-child {
+        animation: none;
+    }
+    .plan-card {
+        transition: none;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -1497,15 +1754,16 @@ select,
     </div>
 </div>
 
-<div class="container" id="app">
-    <!-- 動的に生成されます -->
-</div>
-
 <nav class="plan-pagination" aria-label="プラン表示位置">
     <button type="button" class="plan-dot is-active" data-plan-index="0" aria-label="ライトプランを表示" aria-current="true"></button>
     <button type="button" class="plan-dot" data-plan-index="1" aria-label="スタンダードプランを表示"></button>
     <button type="button" class="plan-dot" data-plan-index="2" aria-label="プレミアムプランを表示"></button>
 </nav>
+
+<div class="container" id="app">
+    <!-- 動的に生成されます -->
+</div>
+
 <button type="button" class="page-top-button" id="pageTopButton" aria-label="ページ上部へ戻る" title="ページ上部へ戻る">↑</button>
 
 <script>
@@ -2063,6 +2321,10 @@ select,
                     dot.removeAttribute('aria-current');
                 }
             });
+
+            cards.forEach((card, index) => {
+                card.classList.toggle('is-current', index === activeIndex);
+            });
         }
 
         function requestPlanPositionUpdate() {
@@ -2078,15 +2340,47 @@ select,
                 if (watchedTotals.has(total)) return;
                 watchedTotals.add(total);
 
+                const resultBox = total.closest('.result-box');
+                if (resultBox) resultBox.setAttribute('aria-live', 'polite');
+
                 const observer = new MutationObserver(() => {
-                    const resultBox = total.closest('.result-box');
-                    if (!resultBox) return;
-                    resultBox.classList.remove('is-updated');
-                    void resultBox.offsetWidth;
-                    resultBox.classList.add('is-updated');
-                    window.setTimeout(() => resultBox.classList.remove('is-updated'), 520);
+                    const liveResultBox = total.closest('.result-box');
+                    if (!liveResultBox) return;
+                    liveResultBox.classList.remove('is-updated');
+                    void liveResultBox.offsetWidth;
+                    liveResultBox.classList.add('is-updated');
+                    window.setTimeout(() => liveResultBox.classList.remove('is-updated'), 520);
                 });
                 observer.observe(total, { childList: true, characterData: true, subtree: true });
+            });
+        }
+
+        function controlHasValue(control) {
+            if (control.tagName === 'SELECT') return control.selectedIndex > 0;
+            return control.value.trim() !== '';
+        }
+
+        function syncControlState(control) {
+            if (!control.matches('input, select')) return;
+
+            control.classList.toggle('has-value', controlHasValue(control));
+            const group = control.closest('.form-group');
+            if (!group) return;
+
+            const controls = Array.from(group.querySelectorAll('input, select'));
+            group.classList.toggle('has-value', controls.some(controlHasValue));
+        }
+
+        function syncAllControlStates() {
+            document.querySelectorAll('.master-price input, .plan-card input, .plan-card select').forEach(syncControlState);
+        }
+
+        function prepareCards() {
+            planContainer.querySelectorAll('.plan-card').forEach((card) => {
+                const title = card.querySelector('.plan-title');
+                if (!title) return;
+                card.setAttribute('role', 'region');
+                card.setAttribute('aria-label', title.textContent.trim());
             });
         }
 
@@ -2098,7 +2392,8 @@ select,
 
                 const containerRect = planContainer.getBoundingClientRect();
                 const cardRect = card.getBoundingClientRect();
-                const targetLeft = cardRect.left - containerRect.left + planContainer.scrollLeft;
+                const containerInset = parseFloat(getComputedStyle(planContainer).paddingLeft) || 0;
+                const targetLeft = cardRect.left - containerRect.left + planContainer.scrollLeft - containerInset;
                 planContainer.scrollTo({ left: targetLeft, behavior: 'smooth' });
             });
         });
@@ -2113,12 +2408,26 @@ select,
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
 
+        document.addEventListener('input', (event) => {
+            syncControlState(event.target);
+            requestAnimationFrame(syncAllControlStates);
+        });
+
+        document.addEventListener('change', (event) => {
+            syncControlState(event.target);
+            requestAnimationFrame(syncAllControlStates);
+        });
+
         const cardObserver = new MutationObserver(() => {
+            prepareCards();
+            syncAllControlStates();
             watchTotals();
             requestPlanPositionUpdate();
         });
         cardObserver.observe(planContainer, { childList: true });
 
+        prepareCards();
+        syncAllControlStates();
         watchTotals();
         updatePlanPosition();
     })();
