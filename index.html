@@ -467,6 +467,36 @@
         };
     }
 
+    function markManualWarranty(index) {
+        const input = document.getElementById(`warranty_${index}`);
+        if (input) input.dataset.manual = "true";
+    }
+
+    function autoFillApplianceWarranty(index, force = false) {
+        if (PRODUCT_META[currentProduct].type !== 'appliance') return null;
+
+        const base = parseInt(document.getElementById('preDiscountPrice').value) || 0;
+        const def = APPLIANCE_PLAN_DEFS[index - 1];
+        const warrantyInfo = applianceWarrantyInfo(base, def);
+        const input = document.getElementById(`warranty_${index}`);
+        const amountLabel = document.getElementById(`warrantyAmount_${index}`);
+
+        if (!input) return warrantyInfo;
+        if (force || input.dataset.manual !== "true") {
+            input.value = warrantyInfo.amount > 0 ? warrantyInfo.amount : "";
+            input.dataset.manual = "false";
+        }
+        input.dataset.autoValue = String(warrantyInfo.amount);
+
+        if (amountLabel) {
+            amountLabel.textContent = warrantyInfo.amount > 0
+                ? `自動計算: ${warrantyInfo.label}`
+                : warrantyInfo.label;
+        }
+
+        return warrantyInfo;
+    }
+
     // ============ 計算：ディスパッチ ============
     function calculate(index) {
         if (PRODUCT_META[currentProduct].type === 'pc') {
@@ -583,10 +613,10 @@
         const pcPrice = parseInt(document.getElementById(`pcPrice_${index}`).value) || 0;  // 値引き後（支払いベース）
 
         const def = APPLIANCE_PLAN_DEFS[index - 1];
-        const warrantyInfo = applianceWarrantyInfo(base, def);
-        const warranty = warrantyInfo.amount;
-        document.getElementById(`warranty_${index}`).value = warranty;
-        document.getElementById(`warrantyAmount_${index}`).textContent = warrantyInfo.label;
+        const warrantyInfo = autoFillApplianceWarranty(index) || applianceWarrantyInfo(base, def);
+        const warrantyInput = document.getElementById(`warranty_${index}`);
+        const warranty = parseInt(warrantyInput.value) || 0;
+        const usesManualWarranty = warrantyInput.dataset.manual === "true" && warranty !== warrantyInfo.amount;
 
         const support = parseInt(document.getElementById(`support_${index}`).value) || 0;
         const discountRaw = parseInt(document.getElementById(`s4Discount_${index}`).value) || 0;
@@ -594,7 +624,9 @@
 
         const note = document.getElementById(`surchargeNote_${index}`);
         if (note) {
-            note.innerHTML = warrantyInfo.note;
+            note.innerHTML = usesManualWarranty
+                ? `<div class="description-item"><span class="description-label">【保証加算】</span>手入力の保証料 ${warranty.toLocaleString()}円で計算（自動計算目安 ${warrantyInfo.label}）</div>`
+                : warrantyInfo.note;
         }
 
         const optionTotal = warranty + support + sdisc;
@@ -721,7 +753,7 @@
                         ★延長保証（${def.warrantyLabel}）
                         <a href="${p.repair}" target="_blank" class="image-link-btn">クリップ 故障例・修理金額</a>
                     </label>
-                    <input type="hidden" id="warranty_${i}" value="0">
+                    <input type="number" id="warranty_${i}" placeholder="POS売価から自動入力" inputmode="numeric" oninput="markManualWarranty(${i}); calculate(${i})">
                     <div class="surcharge-note" id="warrantyAmount_${i}">POS売価を入力すると自動計算されます</div>
                     <div class="surcharge-note" id="surchargeNote_${i}"></div>
                 </div>`;
@@ -787,7 +819,10 @@
 
     document.getElementById('masterPrice').addEventListener('input', applyMasterPrice);
     document.getElementById('preDiscountPrice').addEventListener('input', () => {
-        for (let i = 1; i <= planCount; i++) calculate(i);
+        for (let i = 1; i <= planCount; i++) {
+            autoFillApplianceWarranty(i, true);
+            calculate(i);
+        }
     });
 
     // 初期表示（パソコン）
