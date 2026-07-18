@@ -1,6 +1,6 @@
 // パソコン購入プラン比較 — オフライン対応サービスワーカー
 // 版数を上げると古いキャッシュを破棄して中身を更新する（内容変更のたびに +1 する）
-const CACHE = 'pc-plan-v16';
+const CACHE = 'pc-plan-v17';
 const ASSETS = [
   './',
   './index.html',
@@ -35,6 +35,8 @@ self.addEventListener('activate', (e) => {
     caches.keys()
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
+      .then(() => self.clients.matchAll({ type: 'window', includeUncontrolled: true }))
+      .then((clients) => clients.forEach((client) => client.navigate(client.url)))
   );
 });
 
