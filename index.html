@@ -114,30 +114,6 @@
         font-weight: normal;
         color: #888;
     }
-    .tax-toggle {
-        display: inline-flex;
-        gap: 14px;
-    }
-    .tax-opt {
-        font-size: 0.9em;
-        font-weight: bold;
-        color: #333;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-    }
-    .tax-opt input {
-        width: auto;
-        margin: 0;
-        appearance: auto;
-    }
-    .tax-note {
-        font-size: 0.85em;
-        font-weight: bold;
-        color: #273579;
-        min-height: 1.1em;
-    }
     /* 値引き前の金額（保証5%計算用）：小さめ表示（読みやすさは維持） */
     .pre-discount {
         display: flex;
@@ -335,16 +311,11 @@
 
 <div class="master-price">
     <label for="masterPrice">★<span class="product-name">パソコン</span>本体価格（全プラン共通）<span class="master-hint">値引き後の金額。入力すると3プランすべてに自動反映されます</span></label>
-    <div class="tax-toggle" role="group" aria-label="税込・税抜の切り替え">
-        <label class="tax-opt"><input type="radio" name="taxMode" value="incl" checked>税込</label>
-        <label class="tax-opt"><input type="radio" name="taxMode" value="excl">税抜</label>
-    </div>
     <input type="number" id="masterPrice" placeholder="例: 100000" inputmode="numeric">
     <div class="pre-discount">
         <label for="preDiscountPrice"><span class="threshold-label">値引き前の本体価格（保証5%計算用・20万円以上で加算）</span></label>
         <input type="number" id="preDiscountPrice" placeholder="例: 250000" inputmode="numeric">
     </div>
-    <div class="tax-note" id="taxNote"></div>
 </div>
 
 <div class="container" id="app">
@@ -353,7 +324,6 @@
 
 <script>
     const planCount = 3;
-    const TAX_RATE = 0.10;
 
     // ===== パソコン用データ（既存の内容を維持） =====
     const planTitles = [
@@ -482,12 +452,6 @@
         return num.toLocaleString() + "円";
     }
 
-    // 税抜モードなら税込へ換算（1円未満切り捨て）
-    function taxAdjust(v) {
-        const modeEl = document.querySelector('input[name="taxMode"]:checked');
-        return (modeEl && modeEl.value === 'excl') ? Math.floor(v * (1 + TAX_RATE)) : v;
-    }
-
     // ============ 計算：ディスパッチ ============
     function calculate(index) {
         if (PRODUCT_META[currentProduct].type === 'pc') {
@@ -506,9 +470,8 @@
         const warrantyType = warrantySelect.options[warrantySelect.selectedIndex].dataset.type;
         const warrantyText = warrantySelect.options[warrantySelect.selectedIndex].text;
 
-        // 値引き前（税込換算）が20万円以上のとき、保証料に値引き前価格の5%を加算
-        let preBase = parseInt(document.getElementById('preDiscountPrice').value) || 0;
-        preBase = preBase > 0 ? taxAdjust(preBase) : 0;
+        // 値引き前（税込）が20万円以上のとき、保証料に値引き前価格の5%を加算
+        const preBase = parseInt(document.getElementById('preDiscountPrice').value) || 0;
         let warrantySurcharge = 0;
         if (warrantyVal > 0 && preBase >= PRODUCT_META.pc.threshold) {
             warrantySurcharge = Math.floor(preBase * 0.05);
@@ -598,15 +561,14 @@
 
     // ============ 家電の計算 ============
     function calcAppliance(index) {
-        const baseRaw = parseInt(document.getElementById('preDiscountPrice').value) || 0; // 元値（値引き前）
-        const base = baseRaw > 0 ? taxAdjust(baseRaw) : 0;
+        const base = parseInt(document.getElementById('preDiscountPrice').value) || 0; // 元値（値引き前・税込）
         const pcPrice = parseInt(document.getElementById(`pcPrice_${index}`).value) || 0;  // 値引き後（支払いベース）
 
         let warranty = parseInt(document.getElementById(`warranty_${index}`).value) || 0;
         const support = parseInt(document.getElementById(`support_${index}`).value) || 0;
         const sdisc = parseInt(document.getElementById(`s4Discount_${index}`).value) || 0;
 
-        // 保証5%加算：元値（税込換算）が10万円以上のとき、元値×5%を保証料に加算
+        // 保証5%加算：元値（税込）が10万円以上のとき、元値×5%を保証料に加算
         let surcharge = 0;
         const threshold = PRODUCT_META[currentProduct].threshold;
         if (warranty > 0 && base >= threshold) {
@@ -790,20 +752,9 @@
             </div>`;
     }
 
-    // ===== 共通の本体価格（値引き後）：税込/税抜換算して各プランへ反映 =====
+    // ===== 共通の本体価格（値引き後）：税込入力を各プランへ反映 =====
     function applyMasterPrice() {
-        const raw = parseInt(document.getElementById('masterPrice').value) || 0;
-        const modeEl = document.querySelector('input[name="taxMode"]:checked');
-        const mode = modeEl ? modeEl.value : 'incl';
-        const note = document.getElementById('taxNote');
-
-        let inclusive = raw;
-        if (mode === 'excl') {
-            inclusive = Math.floor(raw * (1 + TAX_RATE));
-            note.textContent = raw > 0 ? `税抜 ${raw.toLocaleString()}円 → 税込 ${inclusive.toLocaleString()}円` : '';
-        } else {
-            note.textContent = '';
-        }
+        const inclusive = parseInt(document.getElementById('masterPrice').value) || 0;
         for (let i = 1; i <= planCount; i++) {
             document.getElementById(`pcPrice_${i}`).value = inclusive > 0 ? inclusive : '';
             calculate(i);
@@ -824,7 +775,6 @@
     }
 
     document.getElementById('masterPrice').addEventListener('input', applyMasterPrice);
-    document.querySelectorAll('input[name="taxMode"]').forEach((r) => r.addEventListener('change', () => { applyMasterPrice(); }));
     document.getElementById('preDiscountPrice').addEventListener('input', () => {
         for (let i = 1; i <= planCount; i++) calculate(i);
     });
