@@ -760,7 +760,7 @@
 
             html += `
                 <div class="form-group">
-                    <label class="discount-label">★プラサポート値引（1,000円〜10,000円）</label>
+                    <label class="discount-label">★サポート値引（1,000円〜10,000円）</label>
                     <select id="s4Discount_${i}" onchange="calculate(${i})">
                         ${S_DISCOUNTS.map(v => `<option value="${v}">${v === 0 ? "適用しない (0円)" : (-v).toLocaleString() + "円値引"}</option>`).join("")}
                     </select>
