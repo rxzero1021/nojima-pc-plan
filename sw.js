@@ -1,6 +1,6 @@
 // パソコン購入プラン比較 — オフライン対応サービスワーカー
 // 版数を上げると古いキャッシュを破棄して中身を更新する（内容変更のたびに +1 する）
-const CACHE = 'pc-plan-v23';
+const CACHE = 'pc-plan-v24';
 const ASSETS = [
   './',
   './index.html',
