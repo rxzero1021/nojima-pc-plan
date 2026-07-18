@@ -16,25 +16,44 @@
 <!-- ============================================================================= -->
 
 <style>
+    :root {
+        --nojima-blue: #273579;
+        --nojima-blue-deep: #1c2a63;
+        --nojima-red: #d71920;
+        --page-bg: #eef1f5;
+        --surface: #ffffff;
+        --text-strong: #20242c;
+        --text-muted: #666d78;
+        --line: #d8dde6;
+    }
+    * {
+        box-sizing: border-box;
+    }
+    html {
+        background: var(--page-bg);
+    }
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
-        background-color: #f5f5f7;
-        margin: 0;
+        background-color: var(--page-bg);
+        max-width: 1600px;
+        margin: 0 auto;
         padding: 20px;
-        color: #333;
+        color: var(--text-strong);
+        line-height: 1.5;
     }
     /* ===== ノジマ ブランドヘッダー（商品プルダウン入り） ===== */
     .brand-header {
-        background: linear-gradient(135deg, #273579 0%, #1c2a63 100%);
+        background: linear-gradient(135deg, var(--nojima-blue) 0%, var(--nojima-blue-deep) 100%);
         color: #fff;
-        border-radius: 16px;
-        padding: 14px 18px;
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 8px;
+        padding: 14px 20px;
         margin-bottom: 20px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        box-shadow: 0 6px 16px rgba(39,53,121,0.28);
+        box-shadow: 0 8px 24px rgba(28,42,99,0.2);
     }
     .brand-left {
         display: flex;
@@ -56,7 +75,7 @@
         font-size: 1.5em;
         font-weight: 800;
         line-height: 1.2;
-        letter-spacing: 0.02em;
+        letter-spacing: 0;
     }
     .brand-sub {
         margin: 4px 0 0;
@@ -79,7 +98,7 @@
         color: #fff;
         font-weight: bold;
         font-size: 1em;
-        border-radius: 10px;
+        border-radius: 6px;
         padding: 8px 30px 8px 12px;
         width: auto;
         background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E");
@@ -87,32 +106,38 @@
         background-position: right 10px center;
     }
     .product-select option { color: #333; }
-    @media (max-width: 480px) {
-        .brand-title { font-size: 1.2em; }
-        .brand-logo { height: 40px; width: 40px; }
-        .brand-mascot { height: 62px; }
+    .product-select:focus-visible {
+        outline: 3px solid rgba(255,255,255,0.5);
+        outline-offset: 2px;
     }
     /* ===== 全プラン共通の本体価格入力バー ===== */
     .master-price {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        border-left: 6px solid #273579;
-        padding: 16px 20px;
+        background: var(--surface);
+        border: 1px solid #d5daE5;
+        border-left: 6px solid var(--nojima-blue);
+        border-radius: 8px;
+        box-shadow: 0 5px 16px rgba(31,42,72,0.08);
+        padding: 18px 20px;
         margin-bottom: 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: minmax(260px, 1.15fr) minmax(240px, 0.85fr);
+        gap: 8px 24px;
+        align-items: end;
     }
+    .master-price > label { grid-column: 1; }
+    .master-price > #masterPrice { grid-column: 1; }
+    .master-price > .pre-discount { grid-column: 2; grid-row: 1 / span 2; }
     .master-price label {
         font-size: 1em;
         font-weight: bold;
-        color: #273579;
+        color: var(--nojima-blue);
     }
     .master-price .master-hint {
+        display: block;
         font-size: 0.78em;
         font-weight: normal;
-        color: #888;
+        color: var(--text-muted);
+        margin-top: 3px;
     }
     /* POS売価（保証5%計算用）：小さめ表示（読みやすさは維持） */
     .pre-discount {
@@ -124,52 +149,93 @@
     .pre-discount label {
         font-size: 0.8em;
         font-weight: bold;
-        color: #666;
+        color: var(--text-muted);
     }
     .pre-discount input {
-        padding: 8px 10px;
-        font-size: 13px;
-        max-width: 260px;
+        padding: 10px 12px;
+        font-size: 14px;
+        max-width: none;
     }
     .container {
         display: flex;
         flex-direction: row;
-        gap: 15px;
+        gap: 16px;
         overflow-x: auto;
-        padding-bottom: 20px;
+        padding: 2px 2px 20px;
+        scroll-snap-type: x proximity;
+        scrollbar-color: #aeb6c5 transparent;
     }
     .plan-card {
-        background: #fff;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        --plan-accent: #6b7280;
+        --plan-accent-strong: #4b5563;
+        --plan-soft: #f4f5f7;
+        --plan-soft-strong: #eceef2;
+        --plan-border: #cfd4dc;
+        background: var(--surface);
+        border: 1px solid var(--plan-border);
+        border-top: 6px solid var(--plan-accent);
+        border-radius: 8px;
+        box-shadow: 0 7px 20px rgba(31,42,72,0.09);
         padding: 20px;
         flex: 1;
         min-width: 320px;
         display: flex;
         flex-direction: column;
         gap: 15px;
+        scroll-snap-align: start;
+        transition: box-shadow 160ms ease, transform 160ms ease;
+    }
+    .plan-card:nth-child(1) {
+        --plan-accent: #2d8a50;
+        --plan-accent-strong: #1e6d3c;
+        --plan-soft: #eef8f1;
+        --plan-soft-strong: #e1f1e6;
+        --plan-border: #b8d9c3;
+    }
+    .plan-card:nth-child(2) {
+        --plan-accent: #2867a8;
+        --plan-accent-strong: #1f548d;
+        --plan-soft: #eef5fc;
+        --plan-soft-strong: #e1edf9;
+        --plan-border: #b9cee5;
+    }
+    .plan-card:nth-child(3) {
+        --plan-accent: #a47712;
+        --plan-accent-strong: #795709;
+        --plan-soft: #fff8e7;
+        --plan-soft-strong: #f8ecc9;
+        --plan-border: #dfc77e;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .plan-card:hover {
+            box-shadow: 0 12px 28px rgba(31,42,72,0.14);
+            transform: translateY(-2px);
+        }
     }
     .plan-title {
-        font-size: 2em;
-        font-weight: bold;
+        background: var(--plan-soft);
+        border: 1px solid var(--plan-border);
+        border-left: 5px solid var(--plan-accent);
+        border-radius: 6px;
+        color: var(--plan-accent-strong);
+        font-size: 1.65em;
+        font-weight: 800;
         text-align: center;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #273579;
-        color: #273579;
-        line-height: 1.4;
+        padding: 12px 10px 11px;
+        line-height: 1.35;
     }
     .plan-subtitle {
         display: block;
         font-size: 0.5em;
         font-weight: normal;
-        color: #555;
+        color: var(--text-muted);
         margin-top: 5px;
     }
     /* 家電：保証内容の縦リスト（お得感を演出） */
     .plan-contents {
-        background: #f3f8f1;
-        border: 1px solid #cde3c8;
-        border-radius: 10px;
+        background: var(--plan-soft);
+        border: 1px solid var(--plan-border);
+        border-radius: 6px;
         padding: 14px 16px;
         margin: 0;
         list-style: none;
@@ -177,13 +243,17 @@
         flex-direction: column;
         gap: 7px;
     }
-    .plan-contents li { font-size: 1.02em; font-weight: bold; color: #2c3e2a; line-height: 1.45; }
-    .plan-contents li.perk { font-size: 0.85em; font-weight: normal; color: #556; }
-    .plan-contents li.perk-head { font-size: 0.8em; color: #888; font-weight: bold; margin-top: 6px; border-top: 1px dashed #b9d3b2; padding-top: 8px; }
+    .plan-contents li { font-size: 1.02em; font-weight: bold; color: var(--plan-accent-strong); line-height: 1.45; }
+    .plan-contents li.perk { font-size: 0.85em; font-weight: normal; color: #555d69; }
+    .plan-contents li.perk-head { font-size: 0.8em; color: #737b87; font-weight: bold; margin-top: 6px; border-top: 1px dashed var(--plan-border); padding-top: 8px; }
     .form-group {
         display: flex;
         flex-direction: column;
-        gap: 5px;
+        gap: 6px;
+    }
+    .form-group > label[style*="display"] {
+        flex-wrap: wrap;
+        gap: 6px 10px;
     }
     /* サポート値引などの値引き項目は色を変えて分かりやすく */
     .discount-label {
@@ -192,41 +262,52 @@
     label {
         font-size: 0.9em;
         font-weight: bold;
-        color: #555;
+        color: #4d5561;
     }
     .button-group {
         display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
         gap: 5px;
     }
     .image-link-btn {
         font-size: 0.8em;
-        color: #273579;
+        color: var(--plan-accent-strong);
         text-decoration: none;
-        background-color: #eef1fb;
+        background-color: var(--plan-soft);
         padding: 4px 8px;
         border-radius: 6px;
         font-weight: normal;
-        border: 1px solid #c9d2f0;
+        border: 1px solid var(--plan-border);
         white-space: nowrap;
     }
     .image-link-btn:active {
-        background-color: #d7ddf4;
+        background-color: var(--plan-soft-strong);
     }
     input, select {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
+        min-height: 42px;
+        padding: 10px 12px;
+        border: 1px solid #c7ccd5;
+        border-radius: 6px;
         font-size: 14px;
-        background-color: #fafafa;
+        background-color: #fff;
         width: 100%;
         box-sizing: border-box;
         appearance: none;
+    }
+    input:hover, select:hover {
+        border-color: #9ba4b2;
+    }
+    input:focus, select:focus {
+        border-color: var(--plan-accent, var(--nojima-blue));
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--plan-accent, var(--nojima-blue)) 16%, transparent);
+        outline: none;
     }
 
     .description-box {
         background-color: #fffde7;
         border: 1px solid #fff59d;
-        border-radius: 8px;
+        border-radius: 6px;
         padding: 12px;
         font-size: 0.85em;
         color: #555;
@@ -247,10 +328,11 @@
     .surcharge-note { font-size: 0.78em; color: #d32f2f; font-weight: bold; min-height: 1em; }
 
     .result-box {
-        background-color: #f0f8ff;
-        border: 1px solid #b0d4ff;
-        border-radius: 8px;
-        padding: 15px;
+        background-color: var(--plan-soft);
+        border: 1px solid var(--plan-border);
+        border-left: 5px solid var(--plan-accent);
+        border-radius: 6px;
+        padding: 16px;
         margin-top: auto;
     }
     .result-missing {
@@ -268,9 +350,18 @@
     .result-total {
         display: flex;
         justify-content: space-between;
-        font-size: 1.3em;
-        font-weight: bold;
-        color: #e61e25;
+        align-items: baseline;
+        gap: 12px;
+        font-size: 1.45em;
+        font-weight: 800;
+        color: var(--nojima-red);
+        line-height: 1.2;
+    }
+    .result-total span:last-child {
+        font-size: 1.35em;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        white-space: nowrap;
     }
     .point-badge {
         display: inline-block;
@@ -283,6 +374,86 @@
         text-align: center;
         margin-top: 10px;
         min-height: 20px;
+    }
+    @media (min-width: 1120px) {
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            overflow: visible;
+        }
+        .plan-card {
+            min-width: 0;
+        }
+    }
+    @media (max-width: 700px) {
+        body {
+            padding: 12px;
+        }
+        .brand-header {
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+        .brand-left {
+            gap: 9px;
+        }
+        .brand-title { font-size: 1.2em; }
+        .brand-logo { height: 40px; width: 40px; }
+        .brand-mascot { height: 56px; }
+        .brand-sub { font-size: 0.72em; }
+        .product-select {
+            font-size: 0.9em;
+            padding: 7px 28px 7px 10px;
+        }
+        .master-price {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 15px;
+            margin-bottom: 14px;
+        }
+        .master-price > label,
+        .master-price > #masterPrice,
+        .master-price > .pre-discount {
+            grid-column: auto;
+            grid-row: auto;
+        }
+        .container {
+            gap: 12px;
+            margin: 0 -12px;
+            padding: 2px 12px 18px;
+            scroll-padding-left: 12px;
+            scrollbar-width: none;
+        }
+        .container::-webkit-scrollbar {
+            display: none;
+        }
+        .plan-card {
+            min-width: min(88vw, 360px);
+            padding: 16px;
+            gap: 13px;
+        }
+        .plan-title {
+            font-size: 1.45em;
+        }
+        .result-total {
+            font-size: 1.28em;
+            flex-wrap: wrap;
+        }
+        .result-total span:last-child {
+            font-size: 1.42em;
+            margin-left: auto;
+        }
+    }
+    @media (max-width: 380px) {
+        .brand-mascot {
+            height: 48px;
+        }
+        .plan-card {
+            min-width: calc(100vw - 38px);
+        }
+        .result-total span:last-child {
+            width: 100%;
+        }
     }
 </style>
 </head>
