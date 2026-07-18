@@ -1,6 +1,6 @@
 // パソコン購入プラン比較 — オフライン対応サービスワーカー
 // 版数を上げると古いキャッシュを破棄して中身を更新する（内容変更のたびに +1 する）
-const CACHE = 'pc-plan-v13';
+const CACHE = 'pc-plan-v14';
 const ASSETS = [
   './',
   './index.html',
@@ -13,7 +13,15 @@ const ASSETS = [
   './sapo2.jpeg',
   './uirusu.jpeg',
   './nojima-logo.png',
-  './mascot.jpeg'
+  './mascot.jpeg',
+  './aircon-leaflet.jpeg',
+  './aircon-repair.jpeg',
+  './tv-leaflet.jpeg',
+  './tv-repair.jpeg',
+  './reizoko-leaflet.jpeg',
+  './reizoko-repair.jpeg',
+  './sentakuki-leaflet.jpeg',
+  './sentakuki-repair.jpeg'
 ];
 
 self.addEventListener('install', (e) => {
