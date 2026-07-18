@@ -185,7 +185,7 @@
         flex-direction: column;
         gap: 5px;
     }
-    /* S4施策などの値引き項目は色を変えて分かりやすく */
+    /* サポート値引などの値引き項目は色を変えて分かりやすく */
     .discount-label {
         color: #d32f2f;
     }
@@ -378,20 +378,6 @@
         { name: "マカフィー 2年分 4,000円 (※富士通パソコン限定)", value: 4000 }
     ];
 
-    const s4Discounts = [
-        { name: "適用しない (0円)", value: 0 },
-        { name: "1,000円値引", value: -1000 },
-        { name: "2,000円値引", value: -2000 },
-        { name: "3,000円値引", value: -3000 },
-        { name: "4,000円値引", value: -4000 },
-        { name: "5,000円値引", value: -5000 },
-        { name: "6,000円値引", value: -6000 },
-        { name: "7,000円値引", value: -7000 },
-        { name: "8,000円値引", value: -8000 },
-        { name: "9,000円値引", value: -9000 },
-        { name: "10,000円値引", value: -10000 }
-    ];
-
     // ===== 家電用データ（比較表画像の内容を転記） =====
     const APPLIANCES = {
         aircon: {
@@ -435,8 +421,6 @@
         { key: "premium",  title: "プレミアムプラン",   sub: "～すべてを網羅した充実のフルサポート～", warrantyLabel: "プレミアム安心保証プラス", points: 3000 }
     ];
 
-    const S_DISCOUNTS = [0,-1000,-2000,-3000,-4000,-5000,-6000,-7000,-8000,-9000,-10000];
-
     // 商品ごとの設定（保証5%加算の閾値：PC=22万、家電=11万）
     const PRODUCT_META = {
         pc:        { name: "パソコン", type: "pc",        threshold: 220000 },
@@ -458,6 +442,33 @@
 
     function posPriceLabel(meta) {
         return `POS売価(各種　値引施策適用前) ※保証5%計算用・税込${formatThreshold(meta.threshold)}以上で加算`;
+    }
+
+    function applianceWarrantyInfo(base, def) {
+        if (base <= 0) {
+            return { amount: 0, label: "POS売価を入力すると自動計算されます", note: "" };
+        }
+
+        const threshold = PRODUCT_META[currentProduct].threshold;
+        const isPremium = def.key === "premium";
+        const fixed = isPremium ? 11000 : 5500;
+        const rate = isPremium ? 0.10 : 0.05;
+        const rateText = isPremium ? "10%" : "5%";
+
+        if (base >= threshold) {
+            const amount = Math.floor(base * rate);
+            return {
+                amount,
+                label: formatCurrency(amount),
+                note: `<div class="description-item"><span class="description-label">【保証加算】</span>POS売価が税込${formatThreshold(threshold)}以上のためPOS売価の${rateText}（${amount.toLocaleString()}円）で計算 → 保証料 ${amount.toLocaleString()}円</div>`
+            };
+        }
+
+        return {
+            amount: fixed,
+            label: formatCurrency(fixed),
+            note: `<div class="description-item"><span class="description-label">【保証加算】</span>POS売価が税込${formatThreshold(threshold)}未満のため保証料 ${fixed.toLocaleString()}円</div>`
+        };
     }
 
     // ============ 計算：ディスパッチ ============
@@ -505,10 +516,11 @@
         let s4Val = 0;
         if (supportVal > 0 && settingText.includes("(会員様)")) {
             s4Group.style.display = "flex";
-            s4Val = parseInt(s4Select.value) || 0;
+            const discountRaw = parseInt(s4Select.value) || 0;
+            s4Val = discountRaw > 0 ? -discountRaw : discountRaw;
         } else {
             s4Group.style.display = "none";
-            s4Select.value = 0;
+            s4Select.value = "";
             s4Val = 0;
         }
 
@@ -524,7 +536,8 @@
         const hasPre = preBase > 0;
         document.getElementById(`resultMissing_${index}`).style.display = hasPre ? "none" : "block";
         document.getElementById(`resultRows_${index}`).style.display = hasPre ? "block" : "none";
-        document.getElementById(`optionTotal_${index}`).innerText = formatCurrency(optionTotal);
+        const optionTotalEl = document.getElementById(`optionTotal_${index}`);
+        if (optionTotalEl) optionTotalEl.innerText = formatCurrency(optionTotal);
         document.getElementById(`grandTotal_${index}`).innerText = formatCurrency(grandTotal);
 
         const pointEl = document.getElementById(`points_${index}`);
@@ -573,35 +586,32 @@
         const base = parseInt(document.getElementById('preDiscountPrice').value) || 0; // POS売価（各種値引施策適用前・税込）
         const pcPrice = parseInt(document.getElementById(`pcPrice_${index}`).value) || 0;  // 値引き後（支払いベース）
 
-        let warranty = parseInt(document.getElementById(`warranty_${index}`).value) || 0;
-        const support = parseInt(document.getElementById(`support_${index}`).value) || 0;
-        const sdisc = parseInt(document.getElementById(`s4Discount_${index}`).value) || 0;
+        const def = APPLIANCE_PLAN_DEFS[index - 1];
+        const warrantyInfo = applianceWarrantyInfo(base, def);
+        const warranty = warrantyInfo.amount;
+        document.getElementById(`warranty_${index}`).value = warranty;
+        document.getElementById(`warrantyAmount_${index}`).textContent = warrantyInfo.label;
 
-        // 保証5%加算：POS売価（税込）が11万円以上のとき、POS売価×5%を保証料に加算
-        let surcharge = 0;
-        const threshold = PRODUCT_META[currentProduct].threshold;
-        if (warranty > 0 && base >= threshold) {
-            surcharge = Math.floor(base * 0.05);
-            warranty += surcharge;
-        }
+        const support = parseInt(document.getElementById(`support_${index}`).value) || 0;
+        const discountRaw = parseInt(document.getElementById(`s4Discount_${index}`).value) || 0;
+        const sdisc = discountRaw > 0 ? -discountRaw : discountRaw;
+
         const note = document.getElementById(`surchargeNote_${index}`);
         if (note) {
-            note.innerHTML = surcharge > 0
-                ? `<div class="description-item"><span class="description-label">【保証加算】</span>POS売価が税込${formatThreshold(threshold)}以上のためPOS売価の5%（+${surcharge.toLocaleString()}円）を加算 → 保証料 ${warranty.toLocaleString()}円</div>`
-                : "";
+            note.innerHTML = warrantyInfo.note;
         }
 
         const optionTotal = warranty + support + sdisc;
         const grandTotal = pcPrice + optionTotal;
 
-        const def = APPLIANCE_PLAN_DEFS[index - 1];
         let points = 0;
         if (def.points > 0 && warranty > 0 && support > 0) points = def.points;
 
         const hasBase = base > 0;
         document.getElementById(`resultMissing_${index}`).style.display = hasBase ? "none" : "block";
         document.getElementById(`resultRows_${index}`).style.display = hasBase ? "block" : "none";
-        document.getElementById(`optionTotal_${index}`).innerText = formatCurrency(optionTotal);
+        const optionTotalEl = document.getElementById(`optionTotal_${index}`);
+        if (optionTotalEl) optionTotalEl.innerText = formatCurrency(optionTotal);
         document.getElementById(`grandTotal_${index}`).innerText = formatCurrency(grandTotal);
 
         const pointEl = document.getElementById(`points_${index}`);
@@ -660,10 +670,9 @@
             html += `</select></div>`;
 
             html += `<div class="form-group" id="s4Group_${i}" style="display:none;">
-                        <label class="discount-label">★S4施策 (条件達成で値引可能)</label>
-                        <select id="s4Discount_${i}" onchange="calculate(${i})">`;
-            s4Discounts.forEach(d => { html += `<option value="${d.value}">${d.name}</option>`; });
-            html += `</select></div>`;
+                        <label class="discount-label">★サポート値引</label>
+                        <input type="number" id="s4Discount_${i}" placeholder="必要時のみ入力" inputmode="numeric" oninput="calculate(${i})">
+                    </div>`;
 
             html += `<div class="form-group"><label>★データ復旧補償</label><select id="dataRecovery_${i}" onchange="calculate(${i})">`;
             dataRecoveries.forEach(d => { html += `<option value="${d.value}">${d.name}</option>`; });
@@ -716,9 +725,13 @@
                         ★延長保証（${def.warrantyLabel}）
                         <a href="${p.repair}" target="_blank" class="image-link-btn">クリップ 故障例・修理金額</a>
                     </label>
-                    <input type="number" id="warranty_${i}" placeholder="金額を入力（商品・単価で変動）" inputmode="numeric" oninput="calculate(${i})">
+                    <input type="hidden" id="warranty_${i}" value="0">
+                    <div class="surcharge-note" id="warrantyAmount_${i}">POS売価を入力すると自動計算されます</div>
                     <div class="surcharge-note" id="surchargeNote_${i}"></div>
                 </div>`;
+
+            const supportValue = currentProduct === "aircon" ? 14300 : "";
+            const supportPlaceholder = currentProduct === "aircon" ? "" : "金額を入力（商品・単価で変動）";
 
             html += `
                 <div class="form-group">
@@ -726,15 +739,13 @@
                         ★サポート
                         <a href="${p.leaflet}" target="_blank" class="image-link-btn">クリップ サポートリーフレット</a>
                     </label>
-                    <input type="number" id="support_${i}" placeholder="金額を入力（商品・単価で変動）" inputmode="numeric" oninput="calculate(${i})">
+                    <input type="number" id="support_${i}" value="${supportValue}" placeholder="${supportPlaceholder}" inputmode="numeric" oninput="calculate(${i})">
                 </div>`;
 
             html += `
                 <div class="form-group">
-                    <label class="discount-label">★サポート値引（1,000円〜10,000円）</label>
-                    <select id="s4Discount_${i}" onchange="calculate(${i})">
-                        ${S_DISCOUNTS.map(v => `<option value="${v}">${v === 0 ? "適用しない (0円)" : (-v).toLocaleString() + "円値引"}</option>`).join("")}
-                    </select>
+                    <label class="discount-label">★サポート値引</label>
+                    <input type="number" id="s4Discount_${i}" placeholder="必要時のみ入力" inputmode="numeric" oninput="calculate(${i})">
                 </div>`;
 
             html += resultBoxHtml(i);
@@ -748,10 +759,6 @@
             <div class="result-box">
                 <div class="result-missing" id="resultMissing_${i}">POS売価が入力されていません</div>
                 <div class="result-rows" id="resultRows_${i}" style="display:none;">
-                    <div class="result-item">
-                        <span>オプション合計:</span>
-                        <span id="optionTotal_${i}">0円</span>
-                    </div>
                     <div class="result-total">
                         <span>総合計:</span>
                         <span id="grandTotal_${i}">0円</span>
